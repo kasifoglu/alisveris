@@ -1,1 +1,14 @@
-<!DOCTYPE html><html><body><button onclick="alert('çalışıyor')">Test</button></body></html>
+<!DOCTYPE html>
+<html>
+<body>
+<input id="inp" placeholder="yaz..."/>
+<button id="btn">+</button>
+<div id="out"></div>
+<script>
+document.getElementById("btn").addEventListener("click", function(){
+  var t = document.getElementById("inp").value;
+  document.getElementById("out").innerHTML += "<p>" + t + "</p>";
+});
+</script>
+</body>
+</html>
