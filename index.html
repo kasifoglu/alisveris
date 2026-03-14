@@ -61,11 +61,9 @@ input:focus{outline:none}textarea:focus{outline:none}
       style="width:50px;height:50px;border-radius:16px;border:none;cursor:pointer;background:rgba(255,255,255,0.15);font-size:24px;font-weight:900;color:#1a1a2e;flex-shrink:0;transition:all .2s;line-height:1">+</button>
   </div>
 
-  <div style="margin-bottom:20px;position:relative;z-index:40">
+  <div style="margin-bottom:20px;">
     <button onclick="toggleBulk()" id="bulk-toggle"
-      style="width:100%;padding:10px 16px;border-radius:14px;border:1.5px dashed rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.4);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"
-      onmouseover="this.style.borderColor='rgba(255,255,255,0.35)';this.style.color='rgba(255,255,255,0.7)'"
-      onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(255,255,255,0.4)'">
+      style="width:100%;padding:14px 16px;border-radius:14px;border:1.5px dashed rgba(255,255,255,0.3);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:rgba(255,255,255,0.1);touch-action:manipulation;">
       <span>📋</span><span>Listeyi buraya yapıştır</span><span id="bulk-arrow">▾</span>
     </button>
     <div id="bulk-area" style="display:none;margin-top:8px;">
@@ -339,8 +337,17 @@ const arrow=document.getElementById(“bulk-arrow”);
 const isOpen=area.style.display!==“none”;
 area.style.display=isOpen?“none”:“block”;
 arrow.textContent=isOpen?“▾”:“▴”;
-if(!isOpen)setTimeout(()=>document.getElementById(“bulk-input”).focus(),50);
 }
+// Also bind touchstart for iOS Safari
+document.addEventListener(“DOMContentLoaded”,function(){
+const btn=document.getElementById(“bulk-toggle”);
+if(btn){
+btn.addEventListener(“touchend”,function(e){
+e.preventDefault();
+toggleBulk();
+});
+}
+});
 
 async function doBulkImport(){
 const ta=document.getElementById(“bulk-input”);
