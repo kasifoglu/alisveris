@@ -349,24 +349,14 @@ document.body.appendChild(t);
 setTimeout(function(){t.style.opacity=“0”;t.style.transition=“opacity .3s”;setTimeout(function(){t.remove();},300);},2500);
 }
 
-async function addItem(){
+function addItem(){
 var text=inp.value.trim();if(!text)return;
 inp.value=””;
 document.getElementById(“suggestions”).style.display=“none”;
-var btn=document.getElementById(“add-btn”);
-btn.textContent=“⏳”;btn.disabled=true;btn.style.background=“rgba(255,255,255,0.15)”;btn.style.boxShadow=“none”;
 var cat=categorize(text);
-try{
-var res=await fetch(“https://api.anthropic.com/v1/messages”,{method:“POST”,headers:{“Content-Type”:“application/json”},
-body:JSON.stringify({model:“claude-sonnet-4-20250514”,max_tokens:15,
-system:“Turk market urun kategorisi: Sut Urunleri, Et & Balik, Sebze & Meyve, Firin & Ekmek, Iecekler, Temizlik, Kisisel Bakim, Atistirmalik, Dondurulmus, Bakliyat, Diger. Sadece kategori adini yaz.”,
-messages:[{role:“user”,content:text}]})});
-var d=await res.json();var ai=d.content&&d.content[0]&&d.content[0].text&&d.content[0].text.trim();
-if(ai&&CAT[ai])cat=ai;
-}catch(e){}
 if(!groups[cat])groups[cat]=[];
 groups[cat].push({id:uid++,name:text});
-btn.textContent=”+”;btn.disabled=false;
+var btn=document.getElementById(“add-btn”);
 btn.style.background=“linear-gradient(135deg,#43e97b,#38f9d7)”;
 btn.style.boxShadow=“0 4px 18px rgba(67,233,123,0.4)”;
 saveData();render();inp.focus();
@@ -384,36 +374,14 @@ if(!open)setTimeout(function(){document.getElementById(“bulk-input”).focus()
 
 document.getElementById(“bulk-btn”).addEventListener(“click”,function(){doBulkImport();});
 
-async function doBulkImport(){
+function doBulkImport(){
 var ta=document.getElementById(“bulk-input”);
 var rawText=ta.value.trim();
 if(!rawText)return;
 var btn=document.getElementById(“bulk-btn”);
 btn.textContent=“Analiz ediliyor…”;btn.disabled=true;
 var added=0;
-var aiOk=false;
-try{
-var res=await fetch(“https://api.anthropic.com/v1/messages”,{method:“POST”,headers:{“Content-Type”:“application/json”},
-body:JSON.stringify({model:“claude-sonnet-4-20250514”,max_tokens:2000,
-system:‘Alisveris listesindeki her urunu bul. SADECE JSON array yaz: [{“name”:“Sogan”,“cat”:“Sebze & Meyve”}]. Kategoriler: Sut Urunleri, Et & Balik, Sebze & Meyve, Firin & Ekmek, Iecekler, Temizlik, Kisisel Bakim, Atistirmalik, Dondurulmus, Bakliyat, Diger.’,
-messages:[{role:“user”,content:rawText}]})});
-var d=await res.json();
-if(d.error)throw new Error(“err”);
-var txt=(d.content&&d.content[0]&&d.content[0].text)||””;
-var b1=txt.indexOf(”[”),b2=txt.lastIndexOf(”]”);
-if(b1===-1||b2<=b1)throw new Error(“no json”);
-var parsed=JSON.parse(txt.slice(b1,b2+1));
-if(!parsed.length)throw new Error(“empty”);
-for(var i=0;i<parsed.length;i++){
-var item=parsed[i];if(!item||!item.name)continue;
-var cat=(item.cat&&CAT[item.cat])?item.cat:categorize(item.name);
-if(!groups[cat])groups[cat]=[];
-groups[cat].push({id:uid++,name:item.name});added++;
-}
-aiOk=true;
-}catch(e){aiOk=false;}
-
-if(!aiOk){
+{
 // Detect separator type
 var hasSep=false;
 for(var i=0;i<rawText.length;i++){
